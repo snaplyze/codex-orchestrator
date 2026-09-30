@@ -396,8 +396,13 @@ class InstallerIntegrationTests(unittest.TestCase):
         target.mkdir()
         return target
 
-    def test_max_two_profile_is_installed_from_numeric_selection(self) -> None:
-        for selection, model in (("3", "gpt-6-astra"), ("4", "gpt-6-luna")):
+    def test_subscription_profiles_are_installed_from_numeric_selection(self) -> None:
+        for selection, model, limit in (
+            ("1", "gpt-6.1-sol", 2),
+            ("2", "gpt-6-luna", 2),
+            ("3", "gpt-6.1-sol", 3),
+            ("4", "gpt-6.1-sol", 4),
+        ):
             with self.subTest(selection=selection):
                 with tempfile.TemporaryDirectory(prefix="codex installer ") as directory:
                     target = self.make_target(directory)
@@ -407,15 +412,50 @@ class InstallerIntegrationTests(unittest.TestCase):
                     self.assertTrue((target / ".codex" / "config.toml").is_file())
                     self.assertTrue((target / ".agents" / "skills" / "codex-orchestrator" / "SKILL.md").is_file())
                     config = (target / ".codex" / "config.toml").read_text()
-                    self.assertIn("max_concurrent_threads_per_session = 2", config)
+                    self.assertIn(f"max_concurrent_threads_per_session = {limit}", config)
                     self.assertIn(f'model = "{model}"', config)
+
+    def test_canonical_and_legacy_text_selection(self) -> None:
+        for selection, profile_name, legacy in (
+            (" Pro-100 ", "pro-100", False),
+            ("PRO-200", "pro-200", False),
+            ("pro-500", "pro-500", False),
+            ("PLUS", "plus", False),
+            ("pro", "pro-100", True),
+            ("PRO-MAX-2-SUBAGENTS", "pro-100", True),
+            ("plus-max-2-subagents", "plus", True),
+        ):
+            with self.subTest(selection=selection):
+                with tempfile.TemporaryDirectory(prefix="codex installer ") as directory:
+                    target = self.make_target(directory)
+                    result = self.run_installer(target, [selection, "y", "y", "y"])
+                    self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                    self.assertEqual(
+                        (target / ".codex" / "config.toml").read_bytes(),
+                        (ROOT / "profiles" / profile_name / "codex" / "config.toml").read_bytes(),
+                    )
+                    self.assertEqual("legacy" in (result.stdout + result.stderr).lower(), legacy)
+
+    def test_default_and_invalid_retry_select_pro_100(self) -> None:
+        for answers in (("",), ("not-a-profile", "")):
+            with self.subTest(answers=answers):
+                with tempfile.TemporaryDirectory(prefix="codex installer ") as directory:
+                    target = self.make_target(directory)
+                    result = self.run_installer(target, [*answers, "y", "y", "y"])
+                    self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                    self.assertEqual(
+                        (target / ".codex" / "config.toml").read_bytes(),
+                        (ROOT / "profiles" / "pro-100" / "codex" / "config.toml").read_bytes(),
+                    )
+                    if answers[0]:
+                        self.assertIn("Please answer", result.stdout)
 
     def test_all_profiles_install_complete_profile_output(self) -> None:
         selections = {
-            "1": "pro",
+            "1": "pro-100",
             "2": "plus",
-            "3": "pro-max-2-subagents",
-            "4": "plus-max-2-subagents",
+            "3": "pro-200",
+            "4": "pro-500",
         }
         for selection, profile_name in selections.items():
             with self.subTest(profile=profile_name):
@@ -446,7 +486,7 @@ class InstallerIntegrationTests(unittest.TestCase):
                     self.assertIn(MANAGED_END, (target / "AGENTS.md").read_text())
 
     def test_upgrade_from_old_pinned_model_preserves_unrelated_files(self) -> None:
-        for selection, profile_name in (("2", "plus"), ("1", "pro")):
+        for selection, profile_name in (("2", "plus"), ("1", "pro-100"), ("3", "pro-200"), ("4", "pro-500")):
             with self.subTest(profile=profile_name):
                 with tempfile.TemporaryDirectory(prefix="codex installer ") as directory:
                     target = self.make_target(directory)
@@ -706,9 +746,12 @@ class InstallerIntegrationTests(unittest.TestCase):
 
     def test_all_profiles_have_five_roles_and_expected_limits(self) -> None:
         expected_limits = {
-            "pro": 4,
+            "pro-100": 2,
+            "pro-200": 3,
+            "pro-500": 4,
+            "pro": 2,
             "pro-max-2-subagents": 2,
-            "plus": 4,
+            "plus": 2,
             "plus-max-2-subagents": 2,
         }
         for profile_name, expected_limit in expected_limits.items():
@@ -722,29 +765,24 @@ class InstallerIntegrationTests(unittest.TestCase):
                 self.assertEqual(len(list((profile / "codex" / "agents").glob("*.toml"))), 5)
                 self.assertTrue((profile / "agents" / "skills" / "codex-orchestrator" / "SKILL.md").is_file())
 
-        for base_name in ("pro", "plus"):
-            with self.subTest(profile_pair=base_name):
-                base = ROOT / "profiles" / base_name
-                limited = ROOT / "profiles" / f"{base_name}-max-2-subagents"
-                base_config = tomllib.loads((base / "codex" / "config.toml").read_text())
-                limited_config = tomllib.loads((limited / "codex" / "config.toml").read_text())
-                base_agents = dict(base_config["agents"])
-                limited_agents = dict(limited_config["agents"])
-                self.assertEqual(limited_config["model"], base_config["model"])
-                self.assertEqual(limited_config["model_reasoning_effort"], base_config["model_reasoning_effort"])
-                limited_agents["max_concurrent_threads_per_session"] = base_agents[
-                    "max_concurrent_threads_per_session"
-                ]
-                self.assertEqual(limited_agents, base_agents)
-                for role in ("explorer", "researcher", "reviewer", "tester", "worker"):
-                    self.assertEqual(
-                        (limited / "codex" / "agents" / f"{role}.toml").read_bytes(),
-                        (base / "codex" / "agents" / f"{role}.toml").read_bytes(),
-                    )
-                self.assertEqual(
-                    (limited / "agents" / "skills" / "codex-orchestrator" / "SKILL.md").read_bytes(),
-                    (base / "agents" / "skills" / "codex-orchestrator" / "SKILL.md").read_bytes(),
-                )
+        for legacy_name, canonical_name in (
+            ("pro", "pro-100"),
+            ("pro-max-2-subagents", "pro-100"),
+            ("plus-max-2-subagents", "plus"),
+        ):
+            with self.subTest(profile_pair=(legacy_name, canonical_name)):
+                legacy = ROOT / "profiles" / legacy_name
+                canonical = ROOT / "profiles" / canonical_name
+                for component in ("codex", "agents"):
+                    legacy_files = {
+                        path.relative_to(legacy / component): path.read_bytes()
+                        for path in (legacy / component).rglob("*") if path.is_file()
+                    }
+                    canonical_files = {
+                        path.relative_to(canonical / component): path.read_bytes()
+                        for path in (canonical / component).rglob("*") if path.is_file()
+                    }
+                    self.assertEqual(legacy_files, canonical_files)
 
     def test_managed_agents_are_idempotent(self) -> None:
         with tempfile.TemporaryDirectory(prefix="codex installer ") as directory:
@@ -829,7 +867,7 @@ class InstallerIntegrationTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             self.assertIn("partial", (result.stdout + result.stderr).lower())
             self.assertIn(
-                "max_concurrent_threads_per_session = 4",
+                "max_concurrent_threads_per_session = 2",
                 (target / ".codex" / "config.toml").read_text(),
             )
 

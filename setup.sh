@@ -20,7 +20,7 @@ agents_instructions_canonical=no
 cat <<'BANNER'
 +----------------------------+
 |      CODEX ORCHESTRATOR    |
-|  Astra, Luna, Sol profiles |
+|  Sol 6.1/Luna profiles   |
 +----------------------------+
 BANNER
 printf '%s\n' 'Interactive project setup'
@@ -395,10 +395,10 @@ merge_conflicts() {
 
 select_plan() {
     printf '%s\n' 'Codex plan:'
-    printf '%s\n' '  1) Pro  - Astra root; Luna defaults/explore/research; Sol worker/tester; Astra reviewer'
-    printf '%s\n' '  2) Plus - Luna root (max); Luna defaults/roles; Astra reviewer'
-    printf '%s\n' '  3) Pro (max 2 subagents)  - Pro topology with two concurrent subagent threads'
-    printf '%s\n' '  4) Plus (max 2 subagents) - Plus topology with two concurrent subagent threads'
+    printf '%s\n' '  1) Pro 100 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 2 child threads'
+    printf '%s\n' '  2) Plus    - Luna root; Luna default children; Sol 6.1 reviewer; 2 child threads'
+    printf '%s\n' '  3) Pro 200 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 3 child threads'
+    printf '%s\n' '  4) Pro 500 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 4 child threads'
 
     while :; do
         printf '%s' 'Select plan [1-4] (default 1): '
@@ -407,12 +407,21 @@ select_plan() {
             exit 1
         fi
 
+        answer=$(printf '%s' "$answer" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]')
         case "$answer" in
-            1|pro|PRO|Pro|'') plan=pro; return ;;
-            2|plus|PLUS|Plus) plan=plus; return ;;
-            3|pro-max-2-subagents|PRO-MAX-2-SUBAGENTS) plan=pro-max-2-subagents; return ;;
-            4|plus-max-2-subagents|PLUS-MAX-2-SUBAGENTS) plan=plus-max-2-subagents; return ;;
-            *) printf '%s\n' 'Please answer 1 (Pro), 2 (Plus), 3 (Pro max 2), or 4 (Plus max 2).' ;;
+            1|pro-100|'') plan=pro-100; return ;;
+            2|plus) plan=plus; return ;;
+            3|pro-200) plan=pro-200; return ;;
+            4|pro-500) plan=pro-500; return ;;
+            pro|pro-max-2-subagents)
+                plan=pro-100
+                printf 'Legacy profile %s now selects %s.\n' "$answer" "$plan"
+                return ;;
+            plus-max-2-subagents)
+                plan=plus
+                printf 'Legacy profile %s now selects %s.\n' "$answer" "$plan"
+                return ;;
+            *) printf '%s\n' 'Please answer 1 (Pro 100), 2 (Plus), 3 (Pro 200), or 4 (Pro 500).' ;;
         esac
     done
 }

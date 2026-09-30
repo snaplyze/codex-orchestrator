@@ -6,13 +6,20 @@ of each subagent's context is served from cache. What this guide gives you
 instead is a repeatable way to measure your own runs, one sample run for
 scale, and the caveats needed to read the numbers correctly.
 
-There are four profile choices: standard Pro and Plus profiles with a
-four-thread limit, and `pro-max-2-subagents` plus `plus-max-2-subagents` with
-a two-thread limit. Max-2 profiles preserve their corresponding root models,
-role models, reasoning efforts, and adaptive routing policy. Pro uses GPT-6
-Astra at `medium`; Plus uses GPT-6 Luna at `max`. Both use an Astra reviewer
-at `low`. The bundled limits are deliberate; change them manually only after
-confirming that your Codex version and plan support a higher concurrency cap.
+There are four canonical profiles: `plus`, `pro-100`, `pro-200`, and
+`pro-500`, with child-thread caps of 2, 2, 3, and 4 respectively. Pro roots and
+worker/tester use Sol 6.1 `medium`; Plus uses a Luna `max` root and Luna `high`
+worker/tester. All reviewers use
+Sol 6.1 `medium`, with Luna `high` for exploration/research and generic children.
+Every profile selects Standard speed. Legacy Pro names now match Pro 100;
+the legacy Plus max-2 name matches Plus.
+
+Concurrency limits bound simultaneous open child threads, not the total amount
+of work. Queueing eight new agents in pairs can still cost more than a single
+agent doing the same eight related edits. Track cumulative delegation and
+repeated context alongside the peak concurrency. Use the
+[work modes](model-selection.md#work-modes-are-separate-from-subscription) to
+control overhead without weakening acceptance.
 
 ## What Codex records
 
@@ -118,9 +125,11 @@ If you want numbers that are comparable across configurations:
    the exact source commit and prepare a separate disposable checkout of that
    same state for each trial. Do not reuse a previous trial's code changes.
 2. Run each task in at least two configurations:
-   - Baseline: Astra root only, `[agents] enabled = false`, no skill.
-   - Orchestrated: the selected Pro, Pro max-2, Plus, or Plus max-2 profile as installed.
-   - Optional floor: Luna root only, to see the cheapest possible run.
+   - Baseline: Sol 6.1 `medium` root only, `[agents] enabled = false`, no skill.
+   - Orchestrated: the selected Plus, Pro 100, Pro 200, or Pro 500 profile as installed.
+   - Optional comparisons: Luna `high` root only and the previous Astra-based
+     topology from an explicitly recorded revision. Do not assume either wins
+     before measuring successful outcomes.
 3. Use a fresh session for each trial and state the cache conditions you can
    control. Do not claim cold caches if the provider cache cannot be reset.
    Record for every run: acceptance checks and success/partial/fail outcome;
@@ -130,19 +139,20 @@ If you want numbers that are comparable across configurations:
    reset boundaries; omit quota deltas when those conditions are unknown.
 4. Repeat each cell two or three times. Variance between runs of the same
    prompt is large enough that a single sample misleads.
-5. Record the profile and any overrides: Pro and Pro max-2 use Astra `medium`,
-   Sol `medium` worker/tester, and Luna `high` explorer/researcher; Plus and
-   Plus max-2 use Luna `max` with Luna `high` execution roles.
-   All profiles use an Astra `low` reviewer. Note whether the concurrency
-   limit is 4 or 2, plus the Codex version. Caching behaviour and subagent context handling
-   change between releases.
+5. Record the canonical profile, work mode, root/role settings, speed, actual
+   subscription tier and overrides. Pro uses Sol 6.1 `medium`; Plus uses a Luna
+   `max` root and Luna `high` execution. All reviewers use Sol 6.1 `medium`.
+   Record the child cap (2/3/4), CLI version, and any deliberate Astra escalation.
+   The log reporter does not identify the installed profile or prove whether a
+   generic `plan_type` distinguishes Pro tiers. Keep this trial metadata yourself;
+   caching and context handling also change between client releases.
 6. Compare cost and latency among successful trials, and separately report the
    success fraction and spread. A short incomplete answer is not an economical
    success. Save redacted commands/results sufficient to repeat one trial.
 
 Suggested results table:
 
-| Task / source commit | Config / client | Acceptance result | Astra uncached / cached / out | Sol uncached / cached / out | Luna uncached / cached / out | Subagents | Wall | Comparable quota delta |
+| Task / source commit | Profile / mode / client / plan / speed | Acceptance result | Astra uncached / cached / out | Sol 6.1 uncached / cached / out | Luna uncached / cached / out | Subagents | Wall | Comparable quota delta |
 |---|---|---|---|---|---|---:|---:|---|
 
 ## Reading the numbers
@@ -213,30 +223,24 @@ Takeaways from this single run:
 
 ## Reducing usage
 
-In rough order of impact:
+- Keep Standard speed. Higher speed and reasoning may consume more allowance;
+  compare successful tasks rather than token totals alone.
+- Use Luna for clear, repeatable work and Sol 6.1 for complex coordination and
+  execution. Reserve Astra for a justified escalation.
+- Handle small tasks in the root. Batch related small assignments and reuse an
+  existing child's relevant context before spawning another.
+- Treat the configured cap as a ceiling. Lower concurrency can slow quota burn
+  over time without reducing total task consumption.
+- Return short findings and evidence instead of copying raw logs into the root.
+- Skip optional review only for low-risk work. Keep requested review and the
+  validation needed for security, data-integrity, and behavior changes.
+- Use current quota snapshots only when identity, reset and account activity are
+  understood; otherwise mark budget unknown. Never derive a task allowance from
+  API prices or assume Pro has a five-hour window.
 
-- On Plus, start with the Luna root and measure the result. Long root threads
-  can dominate usage; savings depend on the task and model behavior. The
-  installer does this when you select the Plus plan; for manual setups see
-  `plus-plan.md`:
-
-  ```toml
-  # Root
-  model = "gpt-6-luna"
-  model_reasoning_effort = "max"
-  ```
-
-- Do not orchestrate small tasks. The skill's delegation gate already says
-  this; enforce it by not invoking `$codex-orchestrator` for one-file edits.
-- Keep `max_concurrent_threads_per_session` low. Each extra concurrent
-  subagent is a second full context being re-read on every response.
-- Ask subagents for short reports. Raw logs pasted into the root are re-read by the
-  root on every subsequent response.
-- Skip the reviewer for low-risk changes. It is Astra, and it re-reads the
-  diff and surrounding context.
-- For simple tasks, try lowering Luna roles from `high` to `medium` and
-  compare quality and usage. Pro's worker/tester use Sol; change the intended
-  role file rather than only the generic subagent default.
+The [model guide](model-selection.md#subscription-facts-and-limits) records the
+dated official subscription conditions. No automatic quota controller or paid
+benchmark is included with these configuration bundles.
 
 ## Contributing results
 

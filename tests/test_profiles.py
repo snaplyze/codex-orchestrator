@@ -4,109 +4,81 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-
+PROFILES = ROOT / "profiles"
+ROLES = {"explorer", "researcher", "worker", "tester", "reviewer"}
 EXPECTED = {
-    "pro": {
-        "root": ("gpt-6-astra", "medium"),
-        "default": ("gpt-6-luna", "high"),
-        "roles": {
-            "explorer": ("gpt-6-luna", "high", "read-only"),
-            "researcher": ("gpt-6-luna", "high", "read-only"),
-            "worker": ("gpt-6-sol", "medium", "workspace-write"),
-            "tester": ("gpt-6-sol", "medium", "workspace-write"),
-            "reviewer": ("gpt-6-astra", "low", "read-only"),
-        },
-    },
-    "plus": {
-        "root": ("gpt-6-luna", "max"),
-        "default": ("gpt-6-luna", "high"),
-        "roles": {
-            "explorer": ("gpt-6-luna", "high", "read-only"),
-            "researcher": ("gpt-6-luna", "high", "read-only"),
-            "worker": ("gpt-6-luna", "high", "workspace-write"),
-            "tester": ("gpt-6-luna", "high", "workspace-write"),
-            "reviewer": ("gpt-6-astra", "low", "read-only"),
-        },
-    },
+    "plus": ("gpt-6-luna", "max", 2, "gpt-6-luna"),
+    "pro-100": ("gpt-6.1-sol", "medium", 2, "gpt-6.1-sol"),
+    "pro-200": ("gpt-6.1-sol", "medium", 3, "gpt-6.1-sol"),
+    "pro-500": ("gpt-6.1-sol", "medium", 4, "gpt-6.1-sol"),
+}
+ALIASES = {
+    "plus-max-2-subagents": "plus",
+    "pro": "pro-100",
+    "pro-max-2-subagents": "pro-100",
 }
 
 
-class ProfileTopologyTests(unittest.TestCase):
-    def test_profiles_share_the_same_orchestration_policy(self) -> None:
-        reference = (ROOT / "profiles/pro/agents/skills/codex-orchestrator/SKILL.md").read_bytes()
-        for profile in (ROOT / "profiles").iterdir():
-            with self.subTest(profile=profile.name):
-                self.assertEqual(
-                    (profile / "agents/skills/codex-orchestrator/SKILL.md").read_bytes(),
-                    reference,
-                    "Shared routing policy must stay consistent across profiles",
-                )
+def bundle_files(profile: Path) -> dict[str, bytes]:
+    return {path.relative_to(profile).as_posix(): path.read_bytes() for path in profile.rglob("*") if path.is_file()}
 
-    def test_profiles_ship_one_skill_with_matching_identity(self) -> None:
-        for profile in (ROOT / "profiles").iterdir():
-            with self.subTest(profile=profile.name):
-                skills = profile / "agents" / "skills"
-                skill_files = list(skills.glob("*/SKILL.md"))
-                self.assertEqual(
-                    [path.parent.name for path in skill_files],
-                    ["codex-orchestrator"],
-                )
-                frontmatter = skill_files[0].read_text().split("---", 2)[1]
+
+class ProfileTopologyTests(unittest.TestCase):
+    def test_canonical_profiles_are_complete(self) -> None:
+        expected_files = {"codex/config.toml", "agents/skills/codex-orchestrator/SKILL.md"}
+        expected_files.update(f"codex/agents/{role}.toml" for role in ROLES)
+        for name in EXPECTED:
+            with self.subTest(profile=name):
+                files = bundle_files(PROFILES / name)
+                self.assertEqual(set(files), expected_files)
+                frontmatter = files["agents/skills/codex-orchestrator/SKILL.md"].decode().split("---", 2)[1]
                 self.assertIn("name: codex-orchestrator", frontmatter.splitlines())
 
-    def test_all_role_files_have_exact_topology(self) -> None:
-        for base_name, expected in EXPECTED.items():
-            for profile_name in (base_name, f"{base_name}-max-2-subagents"):
-                with self.subTest(profile=profile_name):
-                    profile = ROOT / "profiles" / profile_name
-                    config = tomllib.loads((profile / "codex" / "config.toml").read_text())
-                    self.assertEqual(
-                        (config["model"], config["model_reasoning_effort"]),
-                        expected["root"],
-                    )
-                    self.assertTrue(config["agents"]["enabled"])
-                    self.assertEqual(config["approval_policy"], "on-request")
-                    self.assertEqual(config["sandbox_mode"], "workspace-write")
-                    self.assertEqual(
-                        (
-                            config["agents"]["default_subagent_model"],
-                            config["agents"]["default_subagent_reasoning_effort"],
-                        ),
-                        expected["default"],
-                    )
-
-                    role_files = sorted((profile / "codex" / "agents").glob("*.toml"))
-                    self.assertEqual({path.stem for path in role_files}, set(expected["roles"]))
-                    for role_file in role_files:
-                        role = role_file.stem
-                        data = tomllib.loads(role_file.read_text())
-                        self.assertEqual(data["name"], role)
-                        self.assertEqual(
-                            (data["model"], data["model_reasoning_effort"], data["sandbox_mode"]),
-                            expected["roles"][role],
-                        )
-
-    def test_max_two_profiles_differ_only_in_concurrency(self) -> None:
-        for base_name in EXPECTED:
-            with self.subTest(profile_pair=base_name):
-                base = ROOT / "profiles" / base_name
-                limited = ROOT / "profiles" / f"{base_name}-max-2-subagents"
-                base_config = tomllib.loads((base / "codex" / "config.toml").read_text())
-                limited_config = tomllib.loads((limited / "codex" / "config.toml").read_text())
+    def test_canonical_profile_settings_and_roles(self) -> None:
+        for name, (root_model, root_effort, cap, execution_model) in EXPECTED.items():
+            with self.subTest(profile=name):
+                profile = PROFILES / name
+                config = tomllib.loads((profile / "codex/config.toml").read_text())
+                self.assertEqual((config["model"], config["model_reasoning_effort"]), (root_model, root_effort))
+                self.assertEqual(config["service_tier"], "default")
+                self.assertEqual((config["approval_policy"], config["sandbox_mode"]), ("on-request", "workspace-write"))
+                agents = config["agents"]
+                self.assertTrue(agents["enabled"])
+                self.assertEqual(agents["max_concurrent_threads_per_session"], cap)
                 self.assertEqual(
-                    {key: value for key, value in limited_config.items() if key != "agents"},
-                    {key: value for key, value in base_config.items() if key != "agents"},
+                    (agents["default_subagent_model"], agents["default_subagent_reasoning_effort"]),
+                    ("gpt-6-luna", "high"),
                 )
-                limited_agents = dict(limited_config["agents"])
-                base_agents = dict(base_config["agents"])
-                limited_agents.pop("max_concurrent_threads_per_session")
-                base_agents.pop("max_concurrent_threads_per_session")
-                self.assertEqual(limited_agents, base_agents)
-                for role in EXPECTED[base_name]["roles"]:
-                    self.assertEqual(
-                        (limited / "codex" / "agents" / f"{role}.toml").read_bytes(),
-                        (base / "codex" / "agents" / f"{role}.toml").read_bytes(),
+                for role in ROLES:
+                    data = tomllib.loads((profile / "codex/agents" / f"{role}.toml").read_text())
+                    self.assertEqual(data["name"], role)
+                    expected = (
+                        (execution_model, "high" if name == "plus" else "medium", "workspace-write")
+                        if role in {"worker", "tester"}
+                        else ("gpt-6.1-sol", "medium", "read-only")
+                        if role == "reviewer"
+                        else ("gpt-6-luna", "high", "read-only")
                     )
+                    self.assertEqual(
+                        (data["model"], data["model_reasoning_effort"], data["sandbox_mode"]),
+                        expected,
+                    )
+                    self.assertTrue(data["developer_instructions"].strip())
+
+    def test_aliases_are_complete_byte_identical_bundles(self) -> None:
+        for alias, canonical in ALIASES.items():
+            with self.subTest(profile=alias):
+                self.assertEqual(bundle_files(PROFILES / alias), bundle_files(PROFILES / canonical))
+
+    def test_all_profiles_share_the_same_orchestration_policy(self) -> None:
+        reference = (PROFILES / "plus/agents/skills/codex-orchestrator/SKILL.md").read_bytes()
+        self.assertEqual({path.name for path in PROFILES.iterdir() if path.is_dir()}, set(EXPECTED) | set(ALIASES))
+        for name in EXPECTED | ALIASES:
+            with self.subTest(profile=name):
+                self.assertEqual(
+                    (PROFILES / name / "agents/skills/codex-orchestrator/SKILL.md").read_bytes(),
+                    reference,
+                )
 
 
 if __name__ == "__main__":

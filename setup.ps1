@@ -24,7 +24,7 @@ $agentsInstructionsCanonical = $false
 $banner = @'
 +---------------------------------------+
 |          CODEX ORCHESTRATOR            |
-|       GPT-6 Astra/Sol/Luna profiles    |
+|         Sol 6.1/Luna profiles         |
 |      with role-specific routing       |
 +---------------------------------------+
 '@
@@ -62,10 +62,10 @@ function Read-Confirmation {
 
 function Read-Plan {
     [Console]::WriteLine('Codex plan:')
-    [Console]::WriteLine('  1) Pro  - Astra root; Luna defaults/explore/research; Sol worker/tester; Astra reviewer')
-    [Console]::WriteLine('  2) Plus - Luna root (max); Luna defaults/roles; Astra reviewer')
-    [Console]::WriteLine('  3) Pro (max 2 subagents)  - Pro topology with two concurrent subagent threads')
-    [Console]::WriteLine('  4) Plus (max 2 subagents) - Plus topology with two concurrent subagent threads')
+    [Console]::WriteLine('  1) Pro 100 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 2 child threads')
+    [Console]::WriteLine('  2) Plus    - Luna root; Luna default children; Sol 6.1 reviewer; 2 child threads')
+    [Console]::WriteLine('  3) Pro 200 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 3 child threads')
+    [Console]::WriteLine('  4) Pro 500 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 4 child threads')
 
     while ($true) {
         [Console]::Write('Select plan [1-4] (default 1): ')
@@ -75,16 +75,28 @@ function Read-Plan {
         }
 
         switch ($answer.Trim().ToLowerInvariant()) {
-            '1' { return 'pro' }
-            'pro' { return 'pro' }
-            '' { return 'pro' }
+            '1' { return 'pro-100' }
+            'pro-100' { return 'pro-100' }
+            '' { return 'pro-100' }
             '2' { return 'plus' }
             'plus' { return 'plus' }
-            '3' { return 'pro-max-2-subagents' }
-            'pro-max-2-subagents' { return 'pro-max-2-subagents' }
-            '4' { return 'plus-max-2-subagents' }
-            'plus-max-2-subagents' { return 'plus-max-2-subagents' }
-            default { [Console]::WriteLine('Please answer 1 (Pro), 2 (Plus), 3 (Pro max 2), or 4 (Plus max 2).') }
+            '3' { return 'pro-200' }
+            'pro-200' { return 'pro-200' }
+            '4' { return 'pro-500' }
+            'pro-500' { return 'pro-500' }
+            'pro' {
+                [Console]::WriteLine('Legacy profile pro now selects pro-100.')
+                return 'pro-100'
+            }
+            'pro-max-2-subagents' {
+                [Console]::WriteLine('Legacy profile pro-max-2-subagents now selects pro-100.')
+                return 'pro-100'
+            }
+            'plus-max-2-subagents' {
+                [Console]::WriteLine('Legacy profile plus-max-2-subagents now selects plus.')
+                return 'plus'
+            }
+            default { [Console]::WriteLine('Please answer 1 (Pro 100), 2 (Plus), 3 (Pro 200), or 4 (Pro 500).') }
         }
     }
 }

@@ -455,3 +455,100 @@ The release notes match the versioned CHANGELOG.md section. The merged working
 branch was deleted locally and on GitHub; only main remains. This follow-up did
 not reopen the audit or add implementation scope. Use current Git, release and
 native goal state when resuming; do not create a duplicate audit goal.
+
+## Subscription-profile update — 2026-09-30
+
+This is a separately authorized update after the completed audit, based on
+`63dc1008bde7bca0d4435753756e96399338b57f`. The user approved the researched
+Sol 6.1/Luna design and requested Pro 100/200/500 plus an updated Plus profile.
+The audit's historical restrictions and outcomes above are not reopened.
+
+### Initial scope and acceptance (superseded for Plus root effort below)
+
+- Canonical Pro 100/200/500: Sol 6.1 medium root, worker/tester/reviewer;
+  Luna high explorer/researcher and generic children; child caps 2/3/4.
+- Plus: Luna high root and execution, Sol 6.1 medium reviewer, child cap 2.
+- Standard speed in every bundle, unchanged permission defaults and five roles.
+- Both installers select all four canonical bundles; legacy names and directories
+  remain compatible copies. Numeric choices 3/4 change to Pro 200/500 and are
+  explicitly documented for automation migration.
+- One shared skill supports economy/normal/thorough routing, cumulative
+  delegation checks, bounded briefs and honest handling of stale/unknown quota.
+  These are instructions, not an automatic quota controller or new TOML keys.
+- Keep installer transaction/rollback behavior, user files, historical releases,
+  the usage-report schema and installed global settings unchanged.
+
+### Verification checkpoint
+
+Implementation and documentation are complete in the working tree. Independent
+review found no material defects in profiles, aliases, installer selection,
+permissions, shared policy or migration documentation. No commit or publication
+was performed.
+
+- Profile tests were updated first and failed on the missing/new topology, then
+  passed after implementation. Installer selection tests likewise passed after
+  the menu/bundle update.
+- `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -v`: 58 tests passed
+  on Linux with the shell installer, zero skips.
+- `sh -n setup.sh`, `shellcheck setup.sh`, and `git diff --check`: passed.
+- All local file links in 13 documents resolve; eight TOML examples parse.
+- `skill-creator/scripts/quick_validate.py`: passed for the shared skill using
+  PyYAML 6.0.3 in a disposable virtual environment (removed after validation).
+  The host Python lacks PyYAML; no dependency was added to this repository or
+  installed globally. Profile checks verify all seven skill copies are identical.
+- Independent reviewer re-ran the profile suite: four tests passed. Installer
+  transaction/rollback code was unchanged; PowerShell received static review.
+- Policy tabletop probes covered eight routine edits with a two-child cap,
+  economy mode on authorization code, and Pro 500 with a stale quota snapshot.
+  The baseline lacked explicit mode/speed/quota rules. After the update the
+  independent reader retained required review/tests, grouped routine work,
+  kept Standard absent an explicit override, and marked stale quota unknown.
+  This is instruction interpretation, not live agent execution or billing proof.
+
+Current CLI: 0.159.2. PowerShell is not installed on this host; fresh Windows,
+macOS, account-access, and Codex role/skill-discovery runs are unverified. No
+paid quality/usage benchmark or global installation was performed. Historical
+native CI results above do not validate this new working-tree revision.
+
+## Documentation review and v0.4.0 release — 2026-09-30
+
+The user explicitly authorized a complete documentation review, corrections,
+push, tag and GitHub release. They confirmed **Plus root Luna max, children
+high**. This supersedes the same-day initial high-root checkpoint above.
+Pro 100/200/500 retain Sol 6.1 medium with 2/3/4 child caps.
+
+### Review corrections
+
+- Updated Plus root and compatibility copy, tests, README, all current guides
+  and release notes; kept the optional routine root-high preset clearly separate.
+- Clarified that installer bundles are not native Codex `--profile` entries;
+  added post-install launch/trust checks and examples of skill, role and mode use.
+- Specified custom-role model/effort precedence and that active permission
+  overrides can replace role sandbox defaults; preserved no-write role policy.
+- Corrected the bounded-delegation example to include mode, external authority,
+  acceptance and stop conditions; synchronized all seven skills.
+- Updated the forward-looking release pin to v0.4.0, made old-skill migration
+  conditional, and clarified the target-placement instruction versus the
+  installer's exact-path guard. Historical release evidence remains historical.
+- Rechecked official sources. The live Pricing page says Pro has no five-hour
+  limit while Help Center's usage guide retains an older Pro 5x/20x table. The
+  model guide now records this discrepancy and defers to actual account windows.
+
+### Release verification
+
+- The Plus root-max regression failed against the old configuration, then passed
+  after changing both Plus bundles. All 58 local tests passed with zero skips;
+  shell syntax, ShellCheck and `git diff --check` passed.
+- Independent follow-up review found no material issues. File links in 20
+  Markdown documents resolve and eight TOML examples parse. Bundle-path tests
+  use POSIX normalization so their expectations are portable to Windows.
+- Codex CLI 0.159.2 smoke checks installed all four bundles into disposable Git
+  projects. `skills/list` discovered each local skill enabled with no errors;
+  `model/list` advertised Luna max and Sol 6.1 medium support. No inference ran.
+- Effective project configuration and runtime role parsing remain unverified:
+  `config/read` disabled the untrusted project layers, and a per-process trust
+  override did not enable them. Global trust/configuration was not modified.
+  Skill discovery and model metadata do not prove account inference access.
+- Native four-platform CI and publication are pending at this checkpoint; the
+  release will link the successful runs for its commit. No paid quality/usage
+  benchmark or global installation was performed. Prior releases are unchanged.

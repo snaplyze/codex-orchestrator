@@ -1,9 +1,41 @@
 # Migrate to Codex Orchestrator
 
-Version `v0.3.0` renames the repository to
-[`snaplyze/codex-orchestrator`](https://github.com/snaplyze/codex-orchestrator)
-and the skill to `codex-orchestrator`. The four profiles, model choices, role
-names, permissions, and concurrency limits are unchanged.
+The current subscription-profile update is described below. The later sections
+also cover the historical `v0.3.0` repository/skill rename to
+[`snaplyze/codex-orchestrator`](https://github.com/snaplyze/codex-orchestrator);
+that rename itself preserved the then-current models and limits.
+
+## Subscription-profile upgrade
+
+The new canonical names are `pro-100`, `pro-200`, `pro-500`, and `plus`.
+This update changes models and reasoning, not just the installer labels:
+
+| Previous selection | Compatible new selection | Behavior change |
+|---|---|---|
+| `pro` | `pro-100` | Astra root becomes Sol 6.1; cap 4 becomes 2 |
+| `pro-max-2-subagents` | `pro-100` | Astra root becomes Sol 6.1; cap remains 2 |
+| `plus` | `plus` | Luna root stays max; cap 4 becomes 2 |
+| `plus-max-2-subagents` | `plus` | Luna root stays max; cap remains 2 |
+
+Pro worker/tester pins move from Sol to Sol 6.1. Every reviewer moves from Astra
+low to Sol 6.1 medium. All profiles explicitly select Standard speed; existing
+runtime overrides still take precedence. No permission defaults are relaxed.
+
+Legacy textual names are still accepted with a notice, and their profile
+directories remain complete copies of their canonical counterparts. They preserve
+path compatibility, not the previous model behavior. **Numeric choices 3 and 4
+now select Pro 200 and Pro 500**, not the former max-2 variants. Update scripted
+input to explicit canonical names; default/choice 1 now selects Pro 100.
+
+Choose Pro 200 or Pro 500 explicitly if you want caps of three or four with the
+same Sol/Luna roles. The installer does not detect your subscription. The older
+Astra topology remains in Git history if you intentionally need to compare it.
+
+For a project upgrade, follow the component prompts below and inspect replacements
+of custom root/role settings. Update all three components together, then start a
+new trusted session and check the active roles and `/model`. For a global setup,
+use the backup/merge procedure below. Do not overwrite unrelated settings.
+See [model selection](model-selection.md) for access, fallback and work modes.
 
 ## Existing clones
 
@@ -80,8 +112,10 @@ installation, use the same profile for all copied files:
 
 1. Back up `~/.codex/config.toml`, `~/.codex/agents/`, your installed skill, and
    any global `AGENTS.md` instructions.
-2. Move `~/.agents/skills/astra-orchestrator/` to a backup location outside every
-   `skills` directory. Keep any customizations for comparison.
+2. If the legacy `~/.agents/skills/astra-orchestrator/` directory exists, move it
+   to a backup location outside every `skills` directory. Keep customizations
+   for comparison. An installation already using `codex-orchestrator` only
+   needs the backup and update of that current skill.
 3. Copy `profiles/<profile>/agents/skills/codex-orchestrator/` to
    `~/.agents/skills/codex-orchestrator/`.
 4. Merge root configuration and copy all five role files from that profile.
@@ -100,12 +134,12 @@ leaves the old skill discoverable, so retire the previous directory too.
 GitHub releases and tags, `v0.1.0` and `v0.2.0`, are retired. Their changes remain
 in Git history and the [changelog](../CHANGELOG.md).
 
-Update scripts pinned to those tags to use `v0.3.1` and the new repository URL.
+For this release, update scripts pinned to those tags to use `v0.4.0` and the new repository URL.
 Remove obsolete tags from an existing local clone if they are no longer needed:
 
 ```bash
 git tag -d v0.1.0 v0.2.0
-git fetch origin tag v0.3.1
+git fetch origin tag v0.4.0
 ```
 
 Ordinary fetch/prune operations do not remove those local tags automatically.

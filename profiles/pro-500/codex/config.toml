@@ -1,14 +1,14 @@
-# Codex Plus profile: Luna orchestrator and default children.
+# Codex Pro 500 profile: Sol orchestrator, Luna default children.
 # Install at <repo>/.codex/config.toml or merge into user configuration.
 
-model = "gpt-6-luna"
-model_reasoning_effort = "max"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
 service_tier = "default"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 
 [agents]
 enabled = true
-max_concurrent_threads_per_session = 2
+max_concurrent_threads_per_session = 4
 default_subagent_model = "gpt-6-luna"
 default_subagent_reasoning_effort = "high"

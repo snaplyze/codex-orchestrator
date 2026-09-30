@@ -10,7 +10,7 @@ IDs and acceptance criteria; keep status and verification evidence current.
 For development commands and validation boundaries, read `guides/development.md`.
 
 The installed paths below describe target projects. In a clean source checkout,
-read `profiles/pro/agents/skills/codex-orchestrator/SKILL.md` directly when the
+read `profiles/pro-100/agents/skills/codex-orchestrator/SKILL.md` directly when the
 skill is not discovered; all bundled profiles share that policy. Model defaults
 come from the selected profile and active runtime, not the example path.
 

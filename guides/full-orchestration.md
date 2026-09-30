@@ -1,49 +1,54 @@
-# Pro Profiles: Astra, Sol, and Luna
+# Pro 100, Pro 200, and Pro 500
 
-Choose Pro for an Astra coordinator, Sol implementation and testing, and Luna
-exploration and research. Select Pro in `setup.sh` or `setup.ps1` for four
-concurrent child threads, or Pro (max 2 subagents) for two. Setup copies the
-selected profile's `codex/` and `agents/` folders without rewriting them.
+All three Pro profiles use GPT-6.1 Sol for coordination, implementation, testing,
+and ordinary independent review. Luna handles exploration and research. Astra is
+an escalation for difficult decisions, not a permanent coordinator.
 
-```text
-Astra root (medium)
-├── Luna explorer (high)
-├── Sol worker (medium)
-├── Sol tester (medium)
-├── Luna researcher (high)
-└── Astra reviewer (low)
-```
+| Installer choice / directory | Concurrent children |
+|---|---:|
+| Pro 100 / `profiles/pro-100` | 2 |
+| Pro 200 / `profiles/pro-200` | 3 |
+| Pro 500 / `profiles/pro-500` | 4 |
 
-These are available roles, not five simultaneous children or a required pipeline.
-Use only roles that add value, within the selected concurrency cap.
+These are project presets, not OpenAI's account limits. A larger cap is useful
+only for independent work; use fewer agents whenever the task permits.
 
-Put root settings in project `.codex/config.toml`, or merge them into
-`~/.codex/config.toml` for personal use:
+For example, Pro 100 ships these root settings:
 
 ```toml
-model = "gpt-6-astra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
+service_tier = "default"
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
 
 [agents]
 enabled = true
-max_concurrent_threads_per_session = 4
+max_concurrent_threads_per_session = 2
 default_subagent_model = "gpt-6-luna"
 default_subagent_reasoning_effort = "high"
 ```
 
-The max-2 profile changes only `max_concurrent_threads_per_session` to `2`.
-Copy all five role files from the matching profile's `codex/agents/` too:
+Pro 200 and Pro 500 change the child cap to 3 and 4. Copy all five role files
+from the same profile too:
 
-| Role files | Model | Effort | Sandbox |
+| Roles | Model | Effort | Sandbox |
 |---|---|---|---|
 | explorer, researcher | `gpt-6-luna` | `high` | read-only |
-| worker, tester | `gpt-6-sol` | `medium` | workspace-write |
-| reviewer | `gpt-6-astra` | `low` | read-only |
+| worker, tester | `gpt-6.1-sol` | `medium` | workspace-write |
+| reviewer | `gpt-6.1-sol` | `medium` | read-only |
 
-Named roles override the generic subagent defaults. Copy the matching
-`agents/skills/codex-orchestrator/` folder alongside configuration; the skill
-reads effective settings so optional overrides do not require prose edits.
-For existing installations, follow the [rename migration guide](migration.md).
+Roles are available specialists, not a mandatory five-stage pipeline. A worker
+can run its own tests. Use a separate reviewer when the change warrants another
+assessment. Its model stays pinned even if you override generic child defaults.
 
-See [model selection](model-selection.md) for rationale and availability, or
-[Plus](plus-plan.md) for the budget-oriented Luna-root profile.
+Setup copies each bundle without rewriting configuration. For a manual install,
+copy its `codex/` into project `.codex/`, its `agents/` into project `.agents/`,
+and merge the managed instructions. For global use, merge root settings and copy
+roles and skill while preserving unrelated configuration.
+
+The legacy `pro` and `pro-max-2-subagents` bundles now match Pro 100. See
+[migration](migration.md#subscription-profile-upgrade) before upgrading an old
+Astra-based setup. For work modes, subscription caveats, and escalation, see
+[model selection](model-selection.md) and [complex work](complex-repo-work.md).

@@ -12,8 +12,10 @@ before resuming work. Keep implementation claims separate from planned changes.
 
 ## Local checks
 
-Use Python 3.12 or newer for the unittest suite (it imports tomllib), a POSIX shell
-for setup.sh, and PowerShell for setup.ps1. No Python packages are required.
+Use Python 3.12 or newer for the supported unittest matrix, a POSIX shell for
+setup.sh, and PowerShell for setup.ps1. `tomllib` is in the standard library
+since Python 3.11; the repository validates on 3.12. No Python packages are
+required for the repository test suite.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -v
@@ -65,15 +67,20 @@ Use the client settings/picker to check advertised models; a paid model call is
 not required for discovery. Restart after changing configuration. Record each
 unverified platform/account separately; do not change global config for a test.
 
-The model guide records validation against CLI 0.155.1. The audit inspected
-0.157.1 protocol sources and local CLI help, without a new live session. This is
-not a claim that every client version or account has been tested.
+Historical validation covered CLI 0.155.1 and inspected 0.157.1 protocol sources.
+For the subscription-profile update, use its separate checkpoint in the audit
+record for current validation and explicit live-access limits. Neither TOML
+parsing nor installer checks establish that an account can run the pinned models.
 
 ## Change boundaries
 
-Keep all four skills identical while they implement the same policy. Max-2
-variants change concurrency only. Do not replace the profile layout with a
-generator without a concrete need. Preserve user instructions outside managed
+Keep the shared skill identical in all seven bundles. The canonical profiles are
+Plus and Pro 100/200/500. Compatibility bundles `pro` and
+`pro-max-2-subagents` must be byte identical to `pro-100`;
+`plus-max-2-subagents` must be byte identical to `plus`. Canonical Pro profiles
+share roles and differ in their child cap (2/3/4). These caps are presets, not
+subscription entitlements. Do not replace the profile layout with a generator
+without a concrete need. Preserve user instructions outside managed
 markers and unrelated target files. Treat install rollback, file links and
 concurrent user writes as data-integrity boundaries.
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.4.0 — 2026-09-30
+
+- Add Pro 100, Pro 200 and Pro 500 bundles with a GPT-6.1 Sol coordinator,
+  Sol implementation/testing/review, Luna exploration and child caps of 2/3/4.
+- Keep Plus coordination on Luna max, with Luna high children, a two-child cap,
+  and Sol 6.1 independent review.
+  Select Standard speed in every profile; reserve Astra for justified escalation.
+- Add economy/normal/thorough routing guidance, cumulative delegation controls,
+  and handling for unknown/stale quota evidence without an automatic quota reader.
+- Update both installers and preserve legacy profile names and copy-ready paths.
+  Legacy Pro names now select Pro 100; Plus max-2 selects Plus. Numeric choices
+  3/4 now mean Pro 200/500; scripted callers should use explicit profile names.
+- Keep permission defaults, managed-file replacement and rollback boundaries.
+  Update profile/installer regressions and migration/measurement documentation.
+- Clarify installer bundles versus native CLI profiles, actual launch and role
+  invocation, custom-role precedence and live permission overrides. Document the
+  official sources' quota-window discrepancy instead of assuming a fixed window.
+
+Upgrade configuration, all roles, skill and managed instructions together, then
+restart Codex. These presets are not benchmarked savings or account-access
+claims. See the [migration guide](guides/migration.md#subscription-profile-upgrade)
+and [verification checkpoint](docs/audit-remediation.md#documentation-review-and-v040-release--2026-09-30).
+
 ## 0.3.1 — 2026-09-26
 
 - Stage managed-file replacements and roll back only installer-owned changes.

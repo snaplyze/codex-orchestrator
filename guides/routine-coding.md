@@ -1,19 +1,21 @@
 # Routine Coding
 
-For predictable, bounded work, lower the [Plus profile](plus-plan.md) root from
-`max` to `high`. This uses the recommended starting effort for GPT-6 Luna in
-the [official Codex model guidance](https://learn.chatgpt.com/docs/models).
-
-Merge into project `.codex/config.toml` or your personal configuration:
+The [Plus profile](plus-plan.md) uses Luna `max` for coordination. For clear,
+bounded work, deliberately lower the root to `high` with this optional preset:
 
 ```toml
 model = "gpt-6-luna"
 model_reasoning_effort = "high"
+service_tier = "default"
 ```
 
-The installed Luna roles remain at `high`; the Astra reviewer stays at `low`.
-The skill reads effective settings, so no skill wording needs changing.
+Merge only these keys into your configuration. Installed named roles retain their
+own models: changing the root does not move Pro worker/tester to Luna or change
+the Sol 6.1 reviewer. The skill uses the effective settings.
 
-For simple edits, stay in the root. Try `medium` only when your own task checks
-show it is sufficient. Fast service is a separate usage/latency choice and is
-not enabled by this budget-oriented preset.
+Handle small edits in the root. For a bounded delegate, provide the needed paths,
+constraints, and checks; return a short result instead of copying raw logs.
+Economy mode reduces coordination overhead while preserving necessary validation.
+Try lower reasoning only when representative checks show it is sufficient.
+
+See [work modes](model-selection.md#work-modes-are-separate-from-subscription).

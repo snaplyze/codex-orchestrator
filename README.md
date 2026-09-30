@@ -2,109 +2,81 @@
 
 <!-- Modified for this distribution: adaptive delegation guidance, setup URL, and maintainer details. -->
 
-A configurable Codex setup with four profiles: standard Pro and Plus profiles allow four concurrent subagent threads, while `pro-max-2-subagents` and `plus-max-2-subagents` cap concurrency at two. Pro uses GPT-6 Astra as root; Plus uses GPT-6 Luna as root.
+A configurable Codex setup for **Plus, Pro 100, Pro 200, and Pro 500**. Pro uses GPT-6.1 Sol for coordination and execution; Plus uses GPT-6 Luna. All profiles use Sol 6.1 for ordinary independent review and Standard speed.
 
 Repository: [snaplyze/codex-orchestrator](https://github.com/snaplyze/codex-orchestrator).
-For an existing installation, follow the [rename migration guide](guides/migration.md).
+For an existing installation, follow the [profile migration guide](guides/migration.md#subscription-profile-upgrade).
 
 For maintenance and verification, see the [development guide](guides/development.md)
 and [audit remediation plan](docs/audit-remediation.md). The plan separates confirmed
 limitations from pending fixes and records their acceptance checks.
 
-The installer offers a quality-oriented Pro profile and a budget-oriented Plus profile. Pro uses Astra for coordination, Sol for implementation and testing, and Luna for exploration and research. Plus keeps coordination and execution on Luna. Both retain the independent Astra reviewer. Max-2 variants change only concurrency.
-
-These are project presets, not model access restrictions imposed by your subscription. See [model selection and migration](guides/model-selection.md) for the verified September 22, 2026 release details, routing rationale, and rollout fallback.
+The Pro profiles permit two, three, and four concurrent child threads respectively.
+Plus permits two. Astra is available as an escalation for difficult work rather
+than the permanent root/reviewer. These are workload presets, not subscription
+access restrictions or measured savings. See [model selection](guides/model-selection.md)
+for official sources checked on September 30, 2026 and the account-access caveats.
 
 ## Layout
 
 ```text
-.
-├── profiles/
-│   ├── pro/
-│   │   ├── codex/           (config.toml and agents/*.toml)
-│   │   └── agents/          (skills/codex-orchestrator/SKILL.md)
-│   ├── pro-max-2-subagents/  (same Pro settings, max 2 concurrent threads)
-│   ├── plus/
-│   │   ├── codex/           (config.toml and agents/*.toml)
-│   │   └── agents/          (skills/codex-orchestrator/SKILL.md)
-│   └── plus-max-2-subagents/ (same Plus settings, max 2 concurrent threads)
-├── guides/
-│   ├── development.md
-│   ├── migration.md
-│   ├── model-selection.md
-│   ├── fast-iteration.md
-│   ├── complex-repo-work.md
-│   ├── routine-coding.md
-│   ├── full-orchestration.md
-│   ├── plus-plan.md
-│   └── token-usage.md
-├── docs/
-│   └── audit-remediation.md
-├── scripts/
-│   └── token_usage.py
-├── AGENTS.md
-├── CHANGELOG.md
-├── setup.sh
-├── setup.ps1
-└── LICENSE
+profiles/
+  pro-100/                 # Sol 6.1 root and execution, 2 child threads
+  pro-200/                 # Same models, 3 child threads
+  pro-500/                 # Same models, 4 child threads
+  plus/                    # Luna root and execution, 2 child threads
+  pro/                     # Compatibility copy of pro-100
+  pro-max-2-subagents/      # Compatibility copy of pro-100
+  plus-max-2-subagents/     # Compatibility copy of plus
+guides/                    # Setup, model selection, workload and usage guides
+docs/audit-remediation.md   # Audit history and subsequent verification checkpoints
+scripts/token_usage.py     # Read-only rollout usage report
+tests/                     # Profile, installer and usage regressions
+setup.sh / setup.ps1        # Project installers
+AGENTS.md                  # Maintainer rules and distributed instruction block
 ```
+
+Each profile contains `codex/config.toml`, five `codex/agents/*.toml` roles, and
+`agents/skills/codex-orchestrator/SKILL.md`. The shared skill is identical across
+all canonical and compatibility bundles.
 
 ## Current profile configuration
 
-| Role or setting | Pro | Pro max-2 | Plus | Plus max-2 |
+| Role or setting | Plus | Pro 100 | Pro 200 | Pro 500 |
 |---|---|---|---|---|
-| Orchestrator | GPT-6 Astra — medium | GPT-6 Astra — medium | GPT-6 Luna — max | GPT-6 Luna — max |
-| Explorer, researcher | GPT-6 Luna — high | GPT-6 Luna — high | GPT-6 Luna — high | GPT-6 Luna — high |
-| Worker, tester | GPT-6 Sol — medium | GPT-6 Sol — medium | GPT-6 Luna — high | GPT-6 Luna — high |
-| Default subagent | GPT-6 Luna — high | GPT-6 Luna — high | GPT-6 Luna — high | GPT-6 Luna — high |
-| Independent reviewer | GPT-6 Astra — low | GPT-6 Astra — low | GPT-6 Astra — low | GPT-6 Astra — low |
-| Concurrent subagent limit | 4 | 2 | 4 | 2 |
+| Orchestrator | Luna — max | Sol 6.1 — medium | Sol 6.1 — medium | Sol 6.1 — medium |
+| Explorer, researcher | Luna — high | Luna — high | Luna — high | Luna — high |
+| Worker, tester | Luna — high | Sol 6.1 — medium | Sol 6.1 — medium | Sol 6.1 — medium |
+| Default subagent | Luna — high | Luna — high | Luna — high | Luna — high |
+| Independent reviewer | Sol 6.1 — medium | Sol 6.1 — medium | Sol 6.1 — medium | Sol 6.1 — medium |
+| Concurrent child cap | 2 | 2 | 3 | 4 |
+| Speed | Standard | Standard | Standard | Standard |
 
-### Pro — `profiles/pro/codex/config.toml`
+All Luna settings use `gpt-6-luna`; Sol 6.1 uses `gpt-6.1-sol`.
+Root permissions remain `on-request` / `workspace-write`. Explorer, researcher,
+and reviewer default to read-only; worker/tester can write in the workspace.
+The cap excludes the root and does not limit total task usage. Role sandbox
+settings are defaults: active client permission overrides can take precedence;
+read-only role instructions still prohibit file and external writes.
 
-```toml
-model = "gpt-6-astra"
-model_reasoning_effort = "medium"
+The installer copies `profiles/<profile>/codex` to `.codex` and
+`profiles/<profile>/agents` to `.agents` without rewriting configuration.
+Choose `pro-100`, `pro-200`, `pro-500`, or `plus`.
+Legacy `pro` and `pro-max-2-subagents` map to `pro-100`;
+`plus-max-2-subagents` maps to `plus`. Their directories remain copy-ready.
 
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
+These names select installer bundles. They are not native Codex `--profile`
+entries: setup installs the selected bundle as the project's active configuration,
+not a named CLI profile. To switch bundles, rerun setup and approve the updates.
 
-[agents]
-enabled = true
-max_concurrent_threads_per_session = 4
-default_subagent_model = "gpt-6-luna"
-default_subagent_reasoning_effort = "high"
-```
+Named role files pin their model and effort. Changing only the root or
+`default_subagent_model` does not change worker/tester/reviewer settings.
+Update configuration, roles, skill, and managed instructions together, then
+start a new session. Active runtime overrides take precedence.
 
-### Plus — `profiles/plus/codex/config.toml`
-
-```toml
-model = "gpt-6-luna"
-model_reasoning_effort = "max"
-
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
-
-[agents]
-enabled = true
-max_concurrent_threads_per_session = 4
-default_subagent_model = "gpt-6-luna"
-default_subagent_reasoning_effort = "high"
-```
-
-The installer copies `profiles/<plan>/codex` to `.codex` and
-`profiles/<plan>/agents` to `.agents` in the target repository. Each profile
-is ready to copy, with no configuration rewriting during setup.
-
-Each role file pins its own model and effort. Changing only `default_subagent_model` affects generic spawned agents, not these named roles. Pro pins worker/tester to Sol `medium`; all Luna subagents use `high`, and every reviewer uses Astra `low`.
-
-The skill reads effective settings instead of duplicating model IDs and efforts. Session overrides and loaded role definitions remain authoritative until you start a new session.
-
-When updating an existing installation, rerun setup and approve `.codex`, `.agents`, and managed `AGENTS.md` updates.
-For manual installation, copy the config, role files, skill, and managed instructions together from the selected profile.
-Replace `<profile>` below with `pro`, `pro-max-2-subagents`, `plus`, or `plus-max-2-subagents`.
-
-If you want all named roles, including the reviewer, to follow the `[agents]` defaults, remove both the `model` and `model_reasoning_effort` overrides from their role files.
+See [Pro settings](guides/full-orchestration.md) or [Plus settings](guides/plus-plan.md)
+for copyable TOML. Independent review is a separate assessment; it does not
+require keeping Astra in every task.
 
 ## Project setup
 
@@ -115,8 +87,10 @@ git clone https://github.com/snaplyze/codex-orchestrator.git
 cd codex-orchestrator
 ```
 
-The target project must already exist and must be different from this setup
-repository.
+The target project must already exist. Choose a separate directory outside this
+source checkout. Setup rejects the source directory itself; it does not detect
+every nested project layout, so this placement is part of the installation
+instructions rather than a recursive containment guarantee.
 
 ### macOS and Linux
 
@@ -149,22 +123,21 @@ example:
 Target repository path: ../my-project
 ```
 
-Next, choose your Codex plan:
+Next, choose your Codex plan by number or explicit profile name:
 
 ```text
 Codex plan:
-  1) Pro  - Astra root; Luna defaults/explore/research; Sol worker/tester; Astra reviewer
-  2) Plus - Luna root (max); Luna defaults/roles; Astra reviewer
-  3) Pro (max 2 subagents)  - Pro topology with two concurrent subagent threads
-  4) Plus (max 2 subagents) - Plus topology with two concurrent subagent threads
+  1) Pro 100 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 2 child threads
+  2) Plus    - Luna root; Luna default children; Sol 6.1 reviewer; 2 child threads
+  3) Pro 200 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 3 child threads
+  4) Pro 500 - Sol 6.1 root; Luna default children; Sol 6.1 reviewer; 4 child threads
 Select plan [1-4] (default 1):
 ```
 
-The selected configuration sets both the root and default subagent reasoning.
-The max-2 choices preserve the corresponding models, roles, and reasoning while
-limiting concurrent subagent threads to two. Role names are the same in both
-plans, but Pro's worker/tester use Sol and Plus's use Luna. Reviewers use Astra
-at low effort on all four profiles.
+The default is Pro 100. Names are case-insensitive; legacy names print a migration
+notice. **Menu numbers 3 and 4 have changed** from the old max-2 variants to Pro
+200 and Pro 500. Use explicit names in scripted input. The installer does not
+detect or change your subscription, buy credits, or enable Fast/Ultrafast.
 
 The installer then asks whether to install each component:
 
@@ -208,10 +181,20 @@ empty. If `AGENTS.md` changes while its confirmation prompt is open, setup abort
 the stale update. See [recovery and migration](guides/migration.md#failed-updates-and-recovery)
 for conflict handling and the limits of these safeguards.
 
-After setup, launch Codex from the target repository. Project-scoped `.codex`
-configuration is loaded only for trusted projects.
+After setup, launch Codex from the target repository:
 
-See `guides/` for copy-paste model presets and the Astra + Sol + Luna topology. The
+```bash
+cd ../my-project
+codex
+```
+
+Use your actual target path. Complete Codex's normal project-trust flow if prompted;
+project-scoped configuration is loaded only for trusted projects. In the new
+session, inspect `/model` and `/status`, then send the skill prompt below. Check
+that the root matches the chosen bundle and the named roles are loaded. A model
+listed in configuration does not prove that your account can run it.
+
+See `guides/` for copy-paste model presets and the Sol 6.1 + Luna topology. The
 guides are intentionally separate from the installers so you can review and
 adapt settings for your Codex version without changing a global config
 automatically.
@@ -230,10 +213,8 @@ For the skill, copy `profiles/<plan>/agents/skills/codex-orchestrator/` to:
 ~/.agents/skills/codex-orchestrator/
 ```
 
-Merge the settings from the matching profile, such as
-`profiles/pro/codex/config.toml`, `profiles/pro-max-2-subagents/codex/config.toml`,
-`profiles/plus/codex/config.toml`, or
-`profiles/plus-max-2-subagents/codex/config.toml`, into your existing:
+Merge the settings from `profiles/<profile>/codex/config.toml`, selecting
+`pro-100`, `pro-200`, `pro-500`, or `plus`, into your existing:
 
 ```text
 ~/.codex/config.toml
@@ -254,20 +235,28 @@ You can also invoke it explicitly from Codex CLI or the IDE extension with:
 $codex-orchestrator
 ```
 
-Example prompt:
+Example prompt, entered inside Codex (not in the shell):
 
 ```text
 $codex-orchestrator
 
-Implement the new invoice export endpoint.
-Have explorer map the existing invoice/export path first.
-Use workers for bounded implementation, tester for verification,
-and reviewer for an independent final review.
+Normal mode. Implement the new invoice export endpoint.
+Choose the lightest useful delegation for the existing code path.
+Run the relevant tests and have reviewer independently assess the final diff.
+Do not commit or publish.
 ```
+
+For economy mode, start with `Economy mode: ...`; for additional risk-driven
+validation use `Thorough mode: ...`. These phrases guide the shared skill; they
+are not slash commands. Ask explicitly for `explorer`, `worker`, `tester`,
+`researcher`, or `reviewer` when a specific role is useful. Codex starts agents
+through its available tools; there is no separate role executable to launch.
+In clients that expose `/agent`, it lets you inspect/switch existing agent threads.
+See [official subagent guidance](https://learn.chatgpt.com/docs/agent-configuration/subagents).
 
 ## Suggested topology
 
-All four profiles choose delegation depth according to the task:
+All profiles choose delegation depth according to the task:
 
 | Tier | Task | Workflow |
 |---|---|---|
@@ -276,55 +265,34 @@ All four profiles choose delegation depth according to the task:
 | 3 — Full orchestration | Risky or cross-cutting work with multiple workstreams | Add investigation, testing, and independent review as needed |
 
 Start with the lightest tier that fits. Specialists are conditional, and review
-depth follows risk. The diagram shows the available Pro roles; it is not a
-mandatory sequence for every task. Plus uses a Luna root with the same routing
-policy.
+depth follows risk. The root retains decisions and integration; children return
+short findings and verification evidence. Reuse relevant context, batch related
+small assignments, and avoid having several agents explore the same files.
 
-```text
-                 GPT-6 Astra
-             root / orchestrator
-                      |
-      +---------------+---------------+
-      |               |               |
-   explorer          worker         researcher
-     Luna              Sol             Luna
-      |               |
-      +-------+-------+
-              |
-           tester
-             Sol
-              |
-          reviewer
-           Astra
-              |
-              v
-         GPT-6 Astra
-      integrate + verify
-```
+## Work modes and tuning
 
-## Tuning
+The shared skill accepts task-level work modes independently of subscription:
 
-For cheaper/faster runs:
+- **Economy:** small tasks stay in the root; begin with one useful delegate,
+  reuse its context, and reduce optional coordination.
+- **Normal:** use the configured roles for independent work within the cap.
+- **Thorough:** add independent checks for material risk, with higher reasoning
+  or an Astra assessment when justified.
 
-- lower Pro's Astra reasoning from `medium` to `low`
-- lower Luna subagent reasoning from `high` to `medium` for simple, bounded tasks
-- use Sol `medium` as an optional root for complex coding; see [model selection](guides/model-selection.md)
-- choose a max-2 profile when two concurrent threads are enough for the task
+These are instructions, not extra TOML keys or installer switches. Every mode
+preserves required tests, requested review, and the agreed completion criteria.
+The cap is a ceiling, not a quota to fill. Modes do not silently change installed
+models, permissions, or speed.
 
-For larger codebases:
+Keep Standard speed by default, including Pro 500. Choose acceleration explicitly
+when latency justifies its additional usage. Use current `/status` or dashboard
+evidence where available; stale or absent snapshots mean remaining quota is
+unknown. There is no automatic quota controller or inferred subscription budget.
 
-- consider raising Pro's Astra reasoning to `high`
-- start with each role's configured model and effort, then adjust based on results
-- use the standard profile's four-thread cap for independent work; the max-2
-  profiles intentionally cap concurrency at two
-- if you manually raise `max_concurrent_threads_per_session`, confirm that
-  your Codex version and plan support the higher limit before relying on it
-
-For strict parent/child separation:
-
-- keep explorer/reviewer/researcher read-only
-- keep worker/tester workspace-write
-- leave the root in workspace-write so it can integrate changes
+For routine work see [Luna settings](guides/routine-coding.md), for optional speed
+see [fast iteration](guides/fast-iteration.md), and for escalation see
+[complex repository work](guides/complex-repo-work.md). Profile-specific limits and
+official subscription caveats are in [model selection](guides/model-selection.md).
 
 ## Token usage
 
@@ -356,11 +324,17 @@ model_reasoning_effort = "max"
 
 ## Important behavior
 
-Explicit model choices during a spawn override `[agents]` defaults. Custom agent files that specify `model` or `model_reasoning_effort` also take precedence over inherited defaults.
+Before applying a custom role file, Codex resolves model/effort from explicit
+spawn values, then `[agents]` defaults, then the parent. Model/effort pinned in
+the custom role file take precedence over those resolved values. This is why
+overriding a generic child default or merely requesting another model in a
+role's brief does not change the installed role. Active tool schemas can also
+restrict overrides; inspect the selected role before relying on a switch.
 
-The selected profile determines the root model: Pro uses Astra, while Plus uses
-Luna. Pro's worker/tester use Sol; the other execution roles use Luna.
-The reviewer is pinned to Astra for an independent final review.
+The selected profile determines the root model: all Pro presets use Sol 6.1,
+while Plus uses Luna. Pro worker/tester and all reviewers use Sol 6.1.
+Astra escalation must be selected through supported runtime controls; mentioning
+a model in a task message does not change a fixed role's model.
 
 New models roll out by account and workspace. Confirm availability with `/model`
 and start a fresh session after updating files. Setup copies configuration; it
