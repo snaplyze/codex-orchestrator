@@ -549,6 +549,14 @@ Pro 100/200/500 retain Sol 6.1 medium with 2/3/4 child caps.
   `config/read` disabled the untrusted project layers, and a per-process trust
   override did not enable them. Global trust/configuration was not modified.
   Skill discovery and model metadata do not prove account inference access.
-- Native four-platform CI and publication are pending at this checkpoint; the
-  release will link the successful runs for its commit. No paid quality/usage
+- Native CI passed for implementation commit
+  `18f8f71fee3754ad1e8bd5b5587055f184ef2c51`:
+  [run 36703823648](https://github.com/snaplyze/codex-orchestrator/actions/runs/36703823648).
+  All four jobs (Linux, macOS, Windows PowerShell 7 and Windows PowerShell 5.1)
+  ran 58 tests successfully, with applicable syntax/lint checks passing.
+- Shared-skill validation passed again after the final policy edits, using a
+  disposable PyYAML environment. No global dependency installation was made.
+- This documentation-only checkpoint follows the verified implementation.
+  Publication is pending at this checkpoint; v0.4.0 release notes will link CI
+  for the final commit and tag after those runs pass. No paid quality/usage
   benchmark or global installation was performed. Prior releases are unchanged.
