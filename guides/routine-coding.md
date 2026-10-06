@@ -1,5 +1,7 @@
 # Routine Coding
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 The [Plus profile](plus-plan.md) uses Luna `max` for coordination. For clear,
 bounded work, deliberately lower the root to `high` with this optional preset:
 

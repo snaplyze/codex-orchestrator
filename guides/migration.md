@@ -140,9 +140,11 @@ update, inspect the existing files and use one selected bundle throughout:
 4. If `~/.agents/skills/astra-orchestrator/` still exists, retire it from skill
    discovery after carrying forward required customizations. Keep any retained
    legacy directory outside all discovered `skills` directories.
-5. Update the managed instruction block using only the managed block from this
-   repository's `AGENTS.md`, not its source-maintainer section. Preserve user
-   instructions and replace old skill references where applicable.
+5. Merge the managed instruction block into `~/.codex/AGENTS.md` using only the
+   managed block from this repository's `AGENTS.md`, not its source-maintainer
+   section. Preserve user instructions and replace old skill references where
+   applicable. Check for an active `AGENTS.override.md` and avoid duplicating
+   the block in global and project instructions.
 6. Review the resulting diff and syntax, then start a new session and invoke
    `$codex-orchestrator`.
 

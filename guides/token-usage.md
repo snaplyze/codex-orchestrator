@@ -1,5 +1,7 @@
 # Token Usage
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 There is no single token number for this setup. Usage depends on repository
 size, task shape, how many subagents the root actually spawns, and how much
 of each subagent's context is served from cache. What this guide gives you
@@ -55,20 +57,21 @@ tracked in the [remediation plan](../docs/audit-remediation.md).
 ## Measuring a run
 
 `scripts/token_usage.py` does the grouping. It is standard-library Python and
-read-only.
+read-only. Run it from the distribution checkout with Python 3; on Windows,
+use `python` instead of `python3`.
 
 ```bash
 # Which sessions spawned subagents today?
-scripts/token_usage.py --list --date 2026-09-07
+python3 scripts/token_usage.py --list --date 2026-09-07
 
 # Report on one session (any unique id prefix works)
-scripts/token_usage.py --root 01a079f2
+python3 scripts/token_usage.py --root 01a079f2
 
 # Report on the most recent session that used subagents
-scripts/token_usage.py --latest
+python3 scripts/token_usage.py --latest
 
 # Machine-readable output
-scripts/token_usage.py --root 01a079f2 --format json
+python3 scripts/token_usage.py --root 01a079f2 --format json
 ```
 
 Omitting `--date` scans the whole sessions directory, which is slower. `--date`
@@ -170,13 +173,14 @@ Other account activity, resets and missing snapshots prevent attribution to one
 task. Read actual window durations when available instead of assuming every
 primary/secondary pair is five hours/seven days.
 
-The root thread was the largest line item in the historical sample below. It stays
-alive for the whole task, polls subagents, and re-reads its context on every
-response. Parallelism trades tokens for latency: every spawned subagent
-re-reads its own context on every response.
+The root thread was the largest line item in the historical sample below.
+Long root conversations, repeated context, and additional child threads can
+increase recorded input. This sample does not isolate the cost of polling,
+context reuse, or delegation, or establish a latency benefit.
 
-The auto-review guardian threads are Codex's own approval reviewer, not part
-of this setup. They are small but not free.
+Auto-review guardian threads are created by the client rather than this
+distribution. Their recorded usage is excluded by default; inspect it separately
+when needed. The report does not establish how those threads are billed.
 
 ## Sample run
 
@@ -211,12 +215,13 @@ Cache hit rate on input: 96.3%.
 
 Takeaways from this single run:
 
-- About 340k uncached input tokens and 26k output tokens did the real work.
-  The 9.3M total is almost entirely cache hits.
+- The report recorded about 340k uncached input tokens and 26k output tokens.
+  Cached input accounts for most of the 9.3M total; all are recorded usage.
 - The Astra root alone accounted for roughly half of all usage while only
-  emitting 6.9k output tokens. Orchestration overhead is mostly the root
-  staying in the loop.
-- One medium-sized task consumed two thirds of a fresh Plus 5-hour window.
+  emitting 6.9k output tokens. The sample does not separate necessary task
+  context from orchestration overhead.
+- The recorded five-hour snapshot rose by 66 percentage points during this run.
+  The record does not establish whether other account activity contributed.
   This historical Astra-root run does not establish the capacity of the
   current Plus profile. Measure fresh runs with the selected profile; use
   the `routine-coding.md` preset or root-only mode for small edits.
@@ -244,7 +249,8 @@ benchmark is included with these configuration bundles.
 
 ## Contributing results
 
-If you run the protocol on your own projects, open a pull request adding a
-row to the table above with the task description, repository size, Codex
-version, plan type, and the script output. Please redact repository paths
-you do not want published.
+If you run the protocol on your own projects, propose a separate dated results
+table using the suggested format; keep the historical sample unchanged. Include
+acceptance outcomes and sanitized usage summaries, scope, and diagnostics.
+Remove private paths, prompts, and session identifiers before publishing. Do not
+upload raw rollout logs.

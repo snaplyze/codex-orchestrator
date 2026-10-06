@@ -1,5 +1,7 @@
 # Pro 100, Pro 200, and Pro 500
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 All three Pro profiles use GPT-6.1 Sol for coordination, implementation, testing,
 and ordinary independent review. Luna handles exploration and research. Astra is
 an escalation for difficult decisions, not a permanent coordinator.
@@ -46,7 +48,8 @@ assessment. Its model stays pinned even if you override generic child defaults.
 Setup copies each bundle without rewriting configuration. For a manual install,
 copy its `codex/` into project `.codex/`, its `agents/` into project `.agents/`,
 and merge the managed instructions. For global use, merge root settings and copy
-roles and skill while preserving unrelated configuration.
+roles, skill, and managed instructions while preserving unrelated configuration.
+See the [complete global setup](getting-started.md#personalglobal-setup).
 
 The legacy `pro` and `pro-max-2-subagents` bundles now match Pro 100. See
 [migration](migration.md#subscription-profile-upgrade) before upgrading an old

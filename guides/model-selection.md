@@ -1,18 +1,21 @@
 # Model Selection and Subscription Profiles
 
-Official documentation checked on September 30, 2026. These are configuration
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
+Official documentation checked on October 6, 2026. These are configuration
 presets, not measured quality rankings or guarantees of account access. Model
 availability and supported reasoning depend on the client, account, and workspace.
 
 ## Models and routing
 
 OpenAI recommends `gpt-6.1-sol` for complex coding and agentic work when available,
-and `gpt-6-luna` for focused, repeatable work. GPT-6.1 Sol offers near-Astra
-performance at lower cost; keep Astra for the most demanding work.
+and `gpt-6-luna` for focused, repeatable work. The bundled role choices follow
+that guidance; this repository does not benchmark model quality or cost.
 [Official model guidance](https://learn.chatgpt.com/docs/models)
 
 The exact new ID is `gpt-6.1-sol`. Its launch includes Plus, Pro, Business,
-Enterprise, and Edu in supported clients, subject to rollout. Standard and Fast
+Enterprise, and Edu in supported clients, subject to rollout. Enterprise and Edu
+require administrator enablement at launch. Standard and Fast
 are available; Sol 6.1 Ultrafast is not available at launch.
 [Availability](https://learn.chatgpt.com/docs/models#gpt-6.1-sol)
 
@@ -25,9 +28,9 @@ are available; Sol 6.1 Ultrafast is not available at launch.
 
 Explorer, researcher, and generic children use Luna `high` in every profile.
 The cap excludes the root and is a ceiling, not a target. All profiles select
-Standard speed (`service_tier = "default"`). The three Pro profiles deliberately
-share role quality: a higher subscription supports more independent work, not
-an obligation to keep Astra running throughout every task.
+Standard speed (`service_tier = "default"`). The three Pro profiles share the
+same role settings and differ only in their child cap; those caps are project
+choices, not measured capacity or subscription entitlements.
 
 Sol 6.1 `medium` is this repository's balanced starting preset. OpenAI recommends
 starting with the client default for Sol 6.1, `high` for Luna, and `low` for Astra.
@@ -66,12 +69,12 @@ account. This repository does not encode an assumed 5x/10x/25x allowance, infer
 your subscription from its price, or convert API prices into included tasks.
 [Official pricing and usage](https://learn.chatgpt.com/docs/pricing)
 
-The rollout documentation is not fully synchronized as of September 30: Pricing
-says Pro has no five-hour limit, while the
+As of October 6, the Pricing page and
 [Help Center usage guide](https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex)
-still shows a five-hour table with older Pro 5x/20x labels. Do not turn either
-table into fixed runtime assumptions; use the windows actually shown for the
-account. The orchestration policy works with whichever limit windows are present.
+both state that Pro 100/200/500 have no five-hour usage limit in Work and Codex.
+An included allowance still applies. Use the account's actual windows and reset
+times rather than hard-coding a quota policy; these conditions can change. The
+September 30 discrepancy remains historical in the audit record and changelog.
 
 Fast consumes included usage at 2.5x Standard; Astra Ultrafast at 8x. Purchased
 credit multipliers differ. Keep Standard as the default even on Pro 500 and

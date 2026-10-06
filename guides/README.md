@@ -2,8 +2,10 @@
 
 [Repository overview](../README.md) · [Contributing](../CONTRIBUTING.md)
 
-Codex Orchestrator is a configuration distribution. Start with installation and a
-first task; use the reference guides when you need to change how it works.
+Codex Orchestrator provides orchestration profiles with specialized agents,
+adaptive delegation, and project setup for focused and multi-agent coding
+workflows. Start with installation and a first task; use the reference guides
+for configuration and verification details.
 
 ## Start here
 

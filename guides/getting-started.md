@@ -129,7 +129,9 @@ codex
 
 Use your actual path and the client's normal project-trust flow. Project-scoped
 configuration must be trusted before it is loaded. In the new session, inspect
-`/model` and `/status` and confirm the expected root settings and named roles.
+`/model` and `/status` for the expected root settings. Review the five role
+files against the selected bundle; these commands alone do not verify a child
+role's effective settings. Inspect actual child-thread settings when delegating.
 OpenAI documents [custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 and [local skill discovery](https://learn.chatgpt.com/docs/build-skills).
 
@@ -163,6 +165,12 @@ installation uses the same bundle throughout. With the default user paths:
 | `codex/agents/*.toml` | `~/.codex/agents/` |
 | `agents/skills/codex-orchestrator/` | `~/.agents/skills/codex-orchestrator/` |
 | Settings in `codex/config.toml` | Merge into `~/.codex/config.toml` |
+| Managed block in the source `AGENTS.md` | Merge into `~/.codex/AGENTS.md` |
+
+Copy only the managed instruction block, preserving existing global instructions.
+An active `~/.codex/AGENTS.override.md` takes precedence over that global file;
+review the instruction sources actually loaded rather than adding duplicate
+blocks. See [OpenAI's instruction discovery rules](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
 
 Use your client's actual configuration paths when customized. Preserve unrelated
 providers, MCP servers, plugins, permissions, and roles. Do not blindly replace

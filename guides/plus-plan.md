@@ -1,5 +1,7 @@
 # Plus Profile
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 Plus uses GPT-6 Luna at `max` for the coordinator and `high` for bounded
 execution, with a Sol 6.1 reviewer at `medium`. The child cap is two. The higher
 root effort is this project's deliberate preference for coordination depth;
@@ -10,7 +12,9 @@ Select `plus` in either installer. For a manual installation, copy its `codex/`
 to project `.codex/`, its `agents/` to project `.agents/`, and merge the managed
 instructions from the repository's `AGENTS.md`.
 
-For a global setup, merge these settings into your existing configuration:
+For global use, this excerpt shows root model and child defaults. Follow the
+[complete global setup](getting-started.md#personalglobal-setup) for roles, skill,
+permissions, and managed instructions; merge intended settings in place:
 
 ```toml
 model = "gpt-6-luna"

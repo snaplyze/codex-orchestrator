@@ -10,6 +10,10 @@
   status without rewriting historical verification evidence. Runtime behavior,
   profile settings, shared skills, and CI configuration are unchanged.
 
+- Complete a final documentation audit: clarify global instruction placement,
+  refresh official quota guidance, qualify historical usage conclusions, and
+  improve guide navigation and the shared repository description.
+
 ## 0.4.0 — 2026-09-30
 
 - Add Pro 100, Pro 200 and Pro 500 bundles with a GPT-6.1 Sol coordinator,

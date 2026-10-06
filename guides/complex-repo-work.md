@@ -1,5 +1,7 @@
 # Complex Repository Work
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 Start with the selected [Pro profile](full-orchestration.md). Raise Sol 6.1
 reasoning for demonstrated difficulty before treating every complex task as an
 Astra task:
