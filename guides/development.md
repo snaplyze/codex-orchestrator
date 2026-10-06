@@ -1,5 +1,7 @@
 # Development and verification
 
+[Documentation](README.md) · [Contributing](../CONTRIBUTING.md)
+
 This repository distributes ready-to-copy Codex configuration, not a running
 service. Profile TOML owns model/effort/permission settings; the identical skills
 own shared delegation policy. Installers copy a selected bundle and manage only
@@ -87,3 +89,24 @@ concurrent user writes as data-integrity boundaries.
 Historical changelog entries remain historical. Update user-facing behavior
 docs when code lands; record current checks and remaining limits in the plan.
 Publishing, production actions and model charges require applicable authority.
+
+## Documentation maintenance
+
+Keep [the documentation index](README.md) current when adding or moving a guide.
+The root README is the project overview and quick start;
+[getting started](getting-started.md) owns installation/troubleshooting, and
+[usage](usage.md) owns task examples. Profile TOML and installer code remain the
+source of truth. Date external model/subscription claims and preserve historical
+release evidence rather than presenting it as a fresh verification run.
+
+For a documentation-only change, validate relative links and heading anchors,
+render Markdown, and inspect commands, paths, and tables against the source.
+Parse changed TOML examples and issue-form YAML when present. Preserve useful
+inbound anchors when moving README sections. Keep review previews and local
+validation helpers out of the published tree; no documentation-site generator
+or new runtime dependency is required for these guides.
+
+Use the PR to record exact verification results and checks not run. The CI badge
+tracks main; it is not evidence that an unmerged PR passed. Check the PR's actual
+revision and native jobs. Do not run paid inference or change global configuration
+merely to validate documentation.

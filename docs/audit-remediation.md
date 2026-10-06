@@ -560,3 +560,39 @@ Pro 100/200/500 retain Sol 6.1 medium with 2/3/4 child caps.
   Publication is pending at this checkpoint; v0.4.0 release notes will link CI
   for the final commit and tag after those runs pass. No paid quality/usage
   benchmark or global installation was performed. Prior releases are unchanged.
+
+## v0.4.0 publication — confirmed 2026-10-06
+
+The preceding September 30 checkpoint was written before publication; its
+pending-publication statement is historical, not a current release blocker.
+The [v0.4.0 release](https://github.com/snaplyze/codex-orchestrator/releases/tag/v0.4.0)
+was published on September 30, 2026, from
+`7320fcaca31897a69b16a6de695ad6b3e32fa41a`. The release notes link the final
+[main CI](https://github.com/snaplyze/codex-orchestrator/actions/runs/36703995579)
+and [tag CI](https://github.com/snaplyze/codex-orchestrator/actions/runs/36704156142).
+This confirmation does not replace the recorded live-account and runtime-loading
+limits or reopen the completed engineering audit.
+
+## Documentation and presentation refresh — 2026-10-06
+
+Scope: the user requested repository documentation and presentation improvements.
+Baseline main is `7320fcaca31897a69b16a6de695ad6b3e32fa41a`; changes are proposed
+through a documentation PR, without a merge, tag, or new release in this task.
+
+- Shorten the project README, add CI/release/license badges, and preserve its
+  previous section anchors while routing detailed setup and usage to guides.
+- Add a documentation index, installation/troubleshooting walkthrough, practical
+  usage examples, contributor guidance, and focused GitHub issue/PR templates.
+- Clarify migration by version, preserve custom configuration, avoid mandatory
+  manual backup creation and unnecessary local-tag deletion, and retain accurate
+  documentation of the installer's existing transaction behavior.
+- Keep profiles, shared skills, AGENTS.md, installers, usage code, tests, CI,
+  permission defaults, and historical changelog entries unchanged. No new
+  dependency, documentation site, competing roadmap, or global installation.
+
+Acceptance: verify Markdown rendering, local paths and heading anchors, profile
+and command consistency, issue-form YAML structure, and the documentation-only
+file scope. Record fresh check results and the actual PR CI revision in the PR;
+older release CI is not proof that this refresh passed. Live Codex/account access
+and paid model calls are outside this documentation change. Review is by the
+authoring assistant; an independent agent review is not claimed.

@@ -1,0 +1,28 @@
+name: Documentation improvement
+description: Report unclear instructions, incorrect examples, missing guidance, or broken links.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Identify the page and the task you were trying to complete. Do not include
+        private configuration, credentials, prompts, or raw session logs.
+  - type: input
+    id: location
+    attributes:
+      label: Page or section
+      description: Link to the affected file/heading and include the release or commit when relevant.
+      placeholder: guides/getting-started.md — Verify a fresh session
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear, missing, or incorrect?
+      description: Explain the intended task and where the documentation stops helping. Include evidence for a factual correction.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: Optional wording, corrected command, or authoritative reference.
