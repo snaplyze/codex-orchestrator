@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible installer, profile, skill, or usage-report problem.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues first. Use a disposable target for installer
+        reproductions. Share only sanitized excerpts: no credentials, private
+        configuration, raw rollout logs, prompts, or identifying project paths.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and revision
+      description: Include release/commit, OS, shell and version, Codex version, and selected bundle. Mark irrelevant fields as not applicable.
+      placeholder: |
+        Revision:
+        OS and shell:
+        Codex version:
+        Bundle (plus / pro-100 / pro-200 / pro-500 / legacy / custom):
+        Fresh or existing target:
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Give commands, prompt choices, and sanitized input needed to reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and evidence
+      description: Include relevant error text and checks already run. Distinguish observed results from assumptions.
+    validations:
+      required: true

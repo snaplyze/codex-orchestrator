@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Rework the README as a shorter project overview with CI/release/license badges,
+  a quick start, a profile comparison, and links to task-specific documentation.
+- Add a documentation index, installation/troubleshooting walkthrough, usage
+  examples, contributor guidance, and focused GitHub issue/PR templates.
+- Clarify update and manual-install instructions and record the published v0.4.0
+  status without rewriting historical verification evidence. Runtime behavior,
+  profile settings, shared skills, and CI configuration are unchanged.
+
 ## 0.4.0 — 2026-09-30
 
 - Add Pro 100, Pro 200 and Pro 500 bundles with a GPT-6.1 Sol coordinator,
