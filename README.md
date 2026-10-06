@@ -2,13 +2,17 @@
 
 <!-- Modified for this distribution: adaptive delegation, subscription presets, and project documentation. -->
 
-**Ready-to-copy Codex profiles for focused work and bounded multi-agent tasks.**
+**Codex orchestration profiles with specialized agents, adaptive delegation, and
+project setup for focused and multi-agent coding workflows.**
 
 [![CI](https://github.com/snaplyze/codex-orchestrator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/snaplyze/codex-orchestrator/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/snaplyze/codex-orchestrator)](https://github.com/snaplyze/codex-orchestrator/releases/latest)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 [Getting started](guides/getting-started.md) · [Documentation](guides/README.md) · [Profiles](guides/model-selection.md) · [Migration](guides/migration.md) · [Contributing](CONTRIBUTING.md)
+
+For developers and teams using Codex, these bundles combine model settings with
+role instructions and a shared workflow for deciding when to delegate.
 
 Keep small tasks in the root agent. Delegate larger tasks to a focused worker,
 then add exploration, testing, research, or independent review when they help.
@@ -144,7 +148,9 @@ From this distribution checkout, with Python available:
 python3 scripts/token_usage.py --latest
 ```
 
-On Windows, use `python` instead of `python3`. The report reads existing local
+On Windows, use `python` instead of `python3`. `--latest` selects the newest
+recorded session that used non-guardian subagents; if none exists, use `--list`
+and `--root <id>` for a root-only session. The report reads existing local
 rollout logs; it does not call a model. Token totals and quota snapshots are not
 a bill or proof of remaining subscription allowance. Date-filtered reports may
 omit related threads. See [token usage](guides/token-usage.md) before comparing runs

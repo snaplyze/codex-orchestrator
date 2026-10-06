@@ -1,5 +1,7 @@
 # Fast Iteration
 
+[Documentation](README.md) · [Getting started](getting-started.md) · [Usage](usage.md)
+
 All [Pro profiles](full-orchestration.md) already use a Sol 6.1 coordinator at
 `medium`. To use that coordinator with an existing Plus setup, merge:
 
@@ -25,11 +27,11 @@ fast_mode = true
 ```
 
 Merge into existing tables rather than creating duplicate `[features]` sections.
-Fast consumes included subscription usage at 2.5x Standard; purchased credits at
-2x. These are billing multipliers, not promises about task speed. To return to
-Standard, turn Fast off in the client and restore `service_tier = "default"`.
+The [official speed guidance](https://learn.chatgpt.com/docs/agent-configuration/speed),
+checked October 6, 2026, lists Fast at 2.5x Standard for included usage and 2x
+for purchased credits. These are billing multipliers, not promises about task
+speed. To return to Standard, turn Fast off in the client and restore `service_tier = "default"`.
 Check effective runtime settings if a session overrides configuration.
-[Official speed guidance](https://learn.chatgpt.com/docs/agent-configuration/speed)
 
 Pro 500 includes Astra Ultrafast access, but no profile enables it automatically.
 Sol 6.1 Ultrafast is not available at launch. See [model selection](model-selection.md).

@@ -596,3 +596,66 @@ file scope. Record fresh check results and the actual PR CI revision in the PR;
 older release CI is not proof that this refresh passed. Live Codex/account access
 and paid model calls are outside this documentation change. Review is by the
 authoring assistant; an independent agent review is not claimed.
+
+## Final documentation and presentation audit — 2026-10-06
+
+Scope: audit the merged documentation refresh (PR #3), correct documentation,
+update GitHub About, and verify a single follow-up PR before squash merge.
+Initial local HEAD was `7320fcaca31897a69b16a6de695ad6b3e32fa41a`; the audit
+baseline after fast-forward was `a4342607f3849a7ac07ebd763ad26658448b1165`.
+Pre-existing local instruction/checkpoint edits are preserved and excluded from
+this PR. No runtime settings, skills, installers, report code, CI semantics,
+tag, or release are changed.
+
+### Findings and corrections
+
+| ID | Finding | Resolution |
+| --- | --- | --- |
+| DOC-01 | GitHub Description and Topics were empty | Match the README description; select five focused topics; keep Website empty |
+| DOC-02 | Model guide still described the September 30 quota-source discrepancy as current | Recheck official sources on October 6; both now agree on Pro's absence of a five-hour limit; preserve historical records |
+| DOC-03 | Global setup omitted the managed instructions destination; session checks could imply that root commands verify role settings | Document `~/.codex/AGENTS.md`, override precedence, and actual child-setting verification |
+| DOC-04 | Historical usage interpretation implied cost/overhead attribution without controlled evidence | Preserve the sample numbers and date, qualify conclusions, document root-only discovery and portable Python invocation |
+| DOC-05 | Older reference guides lacked consistent return navigation; landing description omitted the intended audience | Add documentation/setup/usage links and clarify the components and developer workflow |
+
+Reviewed README, all guides, contributor guidance, changelog, issue/PR templates,
+source instructions, historical audit/release checkpoints, directory navigation,
+profile/role TOML, shared skills, installers, token reporting, regressions and CI.
+The static source comparison found no functional defect requiring a runtime fix.
+Official references include [models](https://learn.chatgpt.com/docs/models),
+[subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents),
+[instruction discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
+[pricing](https://learn.chatgpt.com/docs/pricing),
+[usage limits](https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex),
+and [speed](https://learn.chatgpt.com/docs/agent-configuration/speed).
+
+### GitHub metadata
+
+Before: Description `""`, Topics `[]`, Website `""`.
+After (read back from GitHub):
+
+- Description: Codex orchestration profiles with specialized agents, adaptive delegation, and project setup for focused and multi-agent coding workflows.
+- Topics: `agent-orchestration`, `ai-agents`, `codex`, `codex-cli`, `developer-tools`.
+- Website: empty; the project has no separate documentation site.
+
+The description names the shipped components without claiming measured savings,
+model superiority, or universal setup safety. The same terms appear in the README
+and documentation index.
+
+### Verification and publication gate
+
+- Local Linux: `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -v` —
+  58 tests, zero failures/skips; `sh -n setup.sh`, `shellcheck setup.sh`, and
+  `git diff --check` pass. Installer tests use disposable targets.
+- Markdown parsing/rendering, local paths and anchors, closed code fences,
+  profile tables against TOML, shared-skill/compatibility invariants, TOML examples,
+  and issue-form YAML are checked with temporary tooling outside the repository.
+  Original README anchors and the historical audit/changelog prefix are retained.
+- Quick Start commands are reviewed against installer tests, the origin URL,
+  and official client guidance. Cloning, installation into a real project,
+  global configuration edits, and paid inference are not performed for this audit.
+- PowerShell is unavailable locally. Native Linux/macOS/PowerShell 7/Windows
+  PowerShell 5.1 results must be confirmed for the actual follow-up PR revision;
+  exact counts, CI links, final review and merge evidence belong in that PR.
+  This pre-merge checkpoint does not claim that pending CI or merge has completed.
+- Live account/model access, paid quality or savings benchmarks, exhaustive
+  external-link availability, production, and a new release remain outside scope.
